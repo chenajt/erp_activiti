@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.generator.dao.PurchaseDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.generator.entity.PurchaseEntity" id="purchaseMap">
+        <result property="id" column="id"/>
+        <result property="itemlist" column="itemlist"/>
+        <result property="total" column="total"/>
+        <result property="applytime" column="applytime"/>
+        <result property="applyer" column="applyer"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="io.renren.modules.generator.entity.PurchaseEntity">
+		select * from purchase where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="io.renren.modules.generator.entity.PurchaseEntity">
+		select * from purchase
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from purchase 
+	</select>
+	 
+	<insert id="save" parameterType="io.renren.modules.generator.entity.PurchaseEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into purchase
+		(
+			`itemlist`, 
+			`total`, 
+			`applytime`, 
+			`applyer`
+		)
+		values
+		(
+			#{itemlist}, 
+			#{total}, 
+			#{applytime}, 
+			#{applyer}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="io.renren.modules.generator.entity.PurchaseEntity">
+		update purchase 
+		<set>
+			<if test="itemlist != null">`itemlist` = #{itemlist}, </if>
+			<if test="total != null">`total` = #{total}, </if>
+			<if test="applytime != null">`applytime` = #{applytime}, </if>
+			<if test="applyer != null">`applyer` = #{applyer}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from purchase where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from purchase where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>
